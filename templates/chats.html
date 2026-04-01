@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat Analyzer - All Chats</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <nav class="navbar">
+            <h1>Chat Analyzer</h1>
+            <div class="nav-links">
+                <a href="{{ url_for('index') }}">New Chat</a>
+                <a href="{{ url_for('view_chats') }}" class="active">All Chats</a>
+            </div>
+        </nav>
+
+        <main class="main-content">
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ category }}">{{ message }}</div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+
+            <div class="chats-header">
+                <h2>All Chats</h2>
+                <span class="chat-count">{{ chats|length }} chat(s)</span>
+            </div>
+
+            <div class="search-container">
+                <form action="{{ url_for('view_chats') }}" method="GET" class="search-form">
+                    <input type="text" name="search" placeholder="Search chats..." value="{{ search_query }}">
+                    <button type="submit" class="btn btn-secondary">Search</button>
+                    {% if search_query %}
+                        <a href="{{ url_for('view_chats') }}" class="btn btn-clear">Clear</a>
+                    {% endif %}
+                </form>
+            </div>
+
+            {% if chats %}
+                <div class="chats-grid">
+                    {% for chat in chats %}
+                        <div class="chat-card">
+                            <div class="chat-header">
+                                <h3>{{ chat.title }}</h3>
+                                <span class="timestamp">{{ chat.created_at }}</span>
+                            </div>
+                            <div class="chat-summary">
+                                <p>{{ chat.summary }}</p>
+                            </div>
+                            <div class="chat-actions">
+                                <a href="{{ url_for('view_chat', chat_id=chat.id) }}" class="btn btn-view">View Full</a>
+                                <form action="{{ url_for('delete_chat', chat_id=chat.id) }}" method="POST" class="delete-form">
+                                    <button type="submit" class="btn btn-delete" onclick="return confirm('Are you sure you want to delete this chat?')">Delete</button>
+                                </form>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="empty-state">
+                    {% if search_query %}
+                        <p>No chats found matching "{{ search_query }}".</p>
+                        <a href="{{ url_for('view_chats') }}" class="btn btn-primary">View All Chats</a>
+                    {% else %}
+                        <p>No chats yet. Create your first chat!</p>
+                        <a href="{{ url_for('index') }}" class="btn btn-primary">Add Chat</a>
+                    {% endif %}
+                </div>
+            {% endif %}
+        </main>
+    </div>
+</body>
+</html>
