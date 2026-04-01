@@ -28,11 +28,6 @@ A web application built using Flask that allows users to store, search, and summ
 
 ---
 
-## 📸 Screenshots
-(Add your screenshots here)
-
----
-
 ## ⚙️ Run Locally
 
 ```bash
