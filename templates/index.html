@@ -3,46 +3,108 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Analyze your WhatsApp chats - upload or paste conversations to get insights">
     <title>Chat Analyzer - New Chat</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
     <div class="container">
-        <nav class="navbar">
+        <!-- Navigation -->
+        <nav class="navbar" role="navigation" aria-label="Main navigation">
             <h1>Chat Analyzer</h1>
             <div class="nav-links">
-                <a href="{{ url_for('index') }}" class="active">New Chat</a>
+                <a href="{{ url_for('index') }}" class="active" aria-current="page">New Chat</a>
                 <a href="{{ url_for('view_chats') }}">All Chats</a>
             </div>
         </nav>
 
+        <!-- Main Content -->
         <main class="main-content">
+            <!-- Flash Messages -->
             {% with messages = get_flashed_messages(with_categories=true) %}
                 {% if messages %}
                     {% for category, message in messages %}
-                        <div class="alert alert-{{ category }}">{{ message }}</div>
+                        <div class="alert alert-{{ category }}" role="alert">{{ message }}</div>
                     {% endfor %}
                 {% endif %}
             {% endwith %}
 
-            <div class="form-container">
-                <h2>Add New Chat</h2>
-                <form action="{{ url_for('submit_chat') }}" method="POST">
+            <!-- Chat Form -->
+            <article class="form-container">
+                <header class="form-header">
+                    <h2>Analyze Your WhatsApp Chat</h2>
+                    <p class="form-description">Upload or paste your exported WhatsApp conversation to get insights and summaries.</p>
+                </header>
+                
+                <!-- Info Box -->
+                <div class="info-box" role="note">
+                    <span class="info-icon" aria-hidden="true">ℹ️</span>
+                    <span>Supports WhatsApp exported .txt format only</span>
+                </div>
+                
+                <!-- Form -->
+                <form action="{{ url_for('submit_chat') }}" method="POST" id="chat-form" novalidate>
+                    <!-- Title Field -->
                     <div class="form-group">
-                        <label for="title">Title</label>
-                        <input type="text" id="title" name="title" placeholder="Enter chat title..." required>
+                        <label for="title">Title <span aria-label="required">*</span></label>
+                        <input 
+                            type="text" 
+                            id="title" 
+                            name="title" 
+                            placeholder="Enter chat title..." 
+                            required
+                            aria-required="true"
+                            autocomplete="off"
+                        >
                     </div>
                     
+                    <!-- File Upload Field -->
                     <div class="form-group">
-                        <label for="content">Chat Content</label>
-                        <textarea id="content" name="content" rows="15" placeholder="Paste your chat conversation here..." required></textarea>
-                        <small class="hint">The first 2-3 lines will be automatically summarized.</small>
+                        <label for="file-upload">Upload Chat File (Optional)</label>
+                        <input 
+                            type="file" 
+                            id="file-upload" 
+                            name="file-upload" 
+                            accept=".txt"
+                            aria-describedby="file-hint file-error"
+                        >
+                        <small id="file-hint" class="hint">Or paste chat content manually below. Only .txt files are accepted.</small>
+                        <div id="file-error" class="file-error" role="alert" aria-live="polite"></div>
                     </div>
                     
-                    <button type="submit" class="btn btn-primary">Save Chat</button>
+                    <!-- Content Field -->
+                    <div class="form-group">
+                        <label for="content">Chat Content <span aria-label="required">*</span></label>
+                        <textarea 
+                            id="content" 
+                            name="content" 
+                            rows="15" 
+                            placeholder="Paste WhatsApp chat OR upload .txt file&#10;&#10;Format:&#10;DD/MM/YY, time - Name: Message&#10;&#10;Example:&#10;12/03/24, 10:45 pm - Gaurav: Hello" 
+                            required
+                            aria-required="true"
+                            aria-describedby="content-hint content-error"
+                        ></textarea>
+                        <small id="content-hint" class="hint">The first 2-3 lines will be automatically summarized.</small>
+                        <div id="content-error" class="file-error" role="alert" aria-live="polite"></div>
+                    </div>
+                    
+                    <!-- Submit Button -->
+                    <button type="submit" class="btn btn-primary" id="submit-btn">Save Chat</button>
+                    
+                    <!-- Loading Indicator -->
+                    <div id="loading-indicator" class="loading-indicator" style="display: none;" aria-live="polite" aria-busy="true">
+                        <span class="spinner" aria-hidden="true"></span>
+                        <span class="loading-text">Analyzing your chat...</span>
+                    </div>
                 </form>
-            </div>
+            </article>
         </main>
     </div>
+
+    <!-- Scripts -->
+    <script src="{{ url_for('static', filename='js/file-uploader.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/form-validator.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/form-handler.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
 </body>
 </html>
