@@ -21,13 +21,27 @@ class ChatAnalyzerApp {
             console.warn('ChatAnalyzerApp already initialized');
             return;
         }
-        
+
+        // Wait for DOM to be fully loaded
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', () => this.initAfterDOM());
+        } else {
+            this.initAfterDOM();
+        }
+    }
+
+    /**
+     * Initialize after DOM is ready
+     */
+    initAfterDOM() {
         // Check if we're on the index page with the form
-        const form = document.querySelector('form[action*="submit_chat"]');
+        const form = document.getElementById('chat-form');
         if (form) {
             this.initChatForm();
+        } else {
+            console.warn('Form #chat-form not found - skipping form initialization');
         }
-        
+
         this.isInitialized = true;
         console.log('ChatAnalyzerApp initialized successfully');
     }
@@ -97,8 +111,14 @@ class ChatAnalyzerApp {
      * @returns {Object} Object containing all form elements
      */
     getFormElements() {
+        const form = document.getElementById('chat-form');
+        if (!form) {
+            console.error('Form #chat-form not found');
+            return {};
+        }
+
         return {
-            form: document.querySelector('form[action*="submit_chat"]'),
+            form: form,
             titleInput: document.getElementById('title'),
             fileInput: document.getElementById('file-upload'),
             contentTextarea: document.getElementById('content'),
@@ -123,16 +143,9 @@ class ChatAnalyzerApp {
     }
 }
 
-// Initialize app when DOM is ready
-if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', () => {
-        window.chatAnalyzerApp = new ChatAnalyzerApp();
-        window.chatAnalyzerApp.init();
-    });
-} else {
-    window.chatAnalyzerApp = new ChatAnalyzerApp();
-    window.chatAnalyzerApp.init();
-}
+// Initialize app
+window.chatAnalyzerApp = new ChatAnalyzerApp();
+window.chatAnalyzerApp.init();
 
 // Export for testing
 if (typeof module !== 'undefined' && module.exports) {
