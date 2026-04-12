@@ -2,6 +2,9 @@ from flask import Flask, render_template, request, redirect, url_for, flash
 import sqlite3
 from datetime import datetime
 import os
+from utils.chat_analyzer import get_sentiment
+from utils.file_parser import extract_text
+from utils.chat_parser import parse_messages
 
 app = Flask(__name__)
 app.secret_key = os.environ.get('SECRET_KEY', 'dev-secret-key-change-in-production')
@@ -51,7 +54,11 @@ def index():
 def submit_chat():
     title = request.form.get('title', '').strip()
     content = request.form.get('content', '').strip()
-    
+
+    file = request.files.get('file-upload')
+    if file and file.filename != '':
+        content = extract_text(file)
+
     if not title or not content:
         flash('Title and content are required!', 'error')
         return redirect(url_for('index'))
@@ -104,7 +111,10 @@ def view_chat(chat_id):
         flash('Chat not found!', 'error')
         return redirect(url_for('view_chats'))
     
-    return render_template('chat_detail.html', chat=chat)
+    messages = [chat['content']]
+    analysis = get_sentiment(messages)
+    
+    return render_template('chat_detail.html', chat=chat, analysis=analysis)
 
 
 @app.route('/delete/<int:chat_id>', methods=['POST'])

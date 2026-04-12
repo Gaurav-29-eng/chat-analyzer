@@ -36,7 +36,64 @@
                             <p>{{ chat.summary }}</p>
                         </div>
                     </section>
-                    
+
+                    <!-- Stats Cards -->
+                    <section aria-labelledby="stats-heading" class="stats-section">
+                        <h4 id="stats-heading">Chat Statistics</h4>
+                        <div class="stats-cards">
+                            <div class="stat-card">
+                                <span class="stat-value">{{ stats.total_messages }}</span>
+                                <span class="stat-label">Total Messages</span>
+                            </div>
+                            <div class="stat-card">
+                                <span class="stat-value">{{ stats.avg_length }}</span>
+                                <span class="stat-label">Avg Length</span>
+                            </div>
+                            <div class="stat-card">
+                                <span class="stat-value">{{ stats.active_time }}</span>
+                                <span class="stat-label">Active Time</span>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Mood Section -->
+                    <section aria-labelledby="mood-heading" class="mood-section">
+                        <h4 id="mood-heading">Sentiment</h4>
+                        <div class="mood-box mood-{{ analysis.mood|lower }}">
+                            <div class="mood-emoji">{{ "😊" if analysis.mood == "Positive" else "😞" if analysis.mood == "Negative" else "😐" }}</div>
+                            <div class="mood-info">
+                                <span class="mood-label">{{ analysis.mood }}</span>
+                                <span class="mood-score">Score: {{ analysis.score }}</span>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- AI Insights Box -->
+                    <section aria-labelledby="insights-heading" class="insights-section">
+                        <h4 id="insights-heading">AI Insights</h4>
+                        <div class="insights-box">
+                            <div class="insight-item">
+                                <strong>Key Insight:</strong> {{ insights.key_insight }}
+                            </div>
+                            <div class="insight-item">
+                                <strong>Engagement:</strong> {{ insights.engagement_level }}
+                            </div>
+                            <div class="insight-item">
+                                <strong>Pattern:</strong> {{ insights.pattern }}
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Top Words -->
+                    <section aria-labelledby="words-heading" class="words-section">
+                        <h4 id="words-heading">Top Words</h4>
+                        <div class="words-chips">
+                            {% for word in top_words %}
+                            <span class="word-chip">{{ word.word }} ({{ word.count }})</span>
+                            {% endfor %}
+                        </div>
+                    </section>
+
                     <!-- Full Content Section -->
                     <section aria-labelledby="content-heading">
                         <h4 id="content-heading">Full Content</h4>

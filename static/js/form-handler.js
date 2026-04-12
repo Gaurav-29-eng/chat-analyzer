@@ -47,7 +47,7 @@ class FormHandler {
         // Run validation if validator is provided
         if (this.validator) {
             const validation = this.validator.validate();
-            
+
             if (!validation.isValid) {
                 event.preventDefault();
                 this.validator.showValidationErrors(validation);
@@ -55,18 +55,28 @@ class FormHandler {
                 return;
             }
         }
-        
+
         // Clear any existing errors
         if (this.validator) {
             this.validator.clear();
         }
-        
+
+        // Clean chat content before sending
+        const chatInput = this.form.querySelector('textarea[name="content"]');
+        if (chatInput) {
+            const cleanText = chatInput.value
+                .replace(/\r\n/g, "\n")
+                .replace(/\t/g, " ")
+                .replace(/[^\x00-\x7F]/g, "");
+            chatInput.value = cleanText;
+        }
+
         // Show loading state
         this.setLoadingState(true);
-        
+
         // Call onSubmit callback
         this.onSubmit();
-        
+
         // Form will submit normally (for server-side rendering)
         // The loading state will persist until page reloads
     }
