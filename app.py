@@ -2,12 +2,16 @@ from flask import Flask, render_template, request, redirect, url_for, flash
 import sqlite3
 from datetime import datetime
 import os
+from flask_cors import CORS
 from utils.chat_analyzer import get_sentiment
 from utils.file_parser import extract_text
 from utils.chat_parser import parse_messages
 
 app = Flask(__name__)
 app.secret_key = os.environ.get('SECRET_KEY', 'dev-secret-key-change-in-production')
+
+# Enable CORS for all routes
+CORS(app)
 DATABASE = 'chats.db'
 
 
@@ -50,6 +54,45 @@ def index():
     return render_template('index.html')
 
 
+@app.route('/analyze', methods=['POST'])
+def analyze_chat():
+    """Analyze chat content and return JSON response."""
+    title = request.form.get('title', '').strip()
+    content = request.form.get('content', '').strip()
+
+    file = request.files.get('file-upload')
+    if file and file.filename != '':
+        content = extract_text(file)
+
+    if not content:
+        return {'error': 'Content is required!'}, 400
+
+    # Parse messages from chat content
+    messages = parse_messages(content)
+    message_texts = [m['message'] for m in messages]
+
+    # Run analysis
+    sentiment = get_sentiment(message_texts)
+    top_words = get_top_words(message_texts)
+    summary = get_summary(message_texts)
+
+    # Build response
+    response = {
+        'success': True,
+        'message': 'Chat analyzed successfully!',
+        'analysis': {
+            'mood': sentiment['mood'],
+            'score': sentiment['score'],
+            'total_messages': len(messages),
+            'avg_length': sum(len(m) for m in message_texts) // max(len(message_texts), 1)
+        },
+        'top_words': [{'word': w[0], 'count': w[1]} for w in top_words],
+        'summary': summary
+    }
+
+    return response
+
+
 @app.route('/submit', methods=['POST'])
 def submit_chat():
     title = request.form.get('title', '').strip()
@@ -62,9 +105,9 @@ def submit_chat():
     if not title or not content:
         flash('Title and content are required!', 'error')
         return redirect(url_for('index'))
-    
+
     summary = generate_summary(content)
-    
+
     conn = get_db_connection()
     conn.execute(
         'INSERT INTO chats (title, content, summary) VALUES (?, ?, ?)',
@@ -72,7 +115,7 @@ def submit_chat():
     )
     conn.commit()
     conn.close()
-    
+
     flash('Chat saved successfully!', 'success')
     return redirect(url_for('view_chats'))
 
