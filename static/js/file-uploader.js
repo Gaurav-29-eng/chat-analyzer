@@ -21,7 +21,7 @@ class FileUploader {
         this.onError = options.onError || (() => {});
         
         this.MAX_FILE_SIZE = options.maxFileSize || 10 * 1024 * 1024;
-        this.ALLOWED_EXTENSION = options.allowedExtension || '.txt';
+        this.ALLOWED_EXTENSIONS = options.allowedExtensions || ['.txt', '.csv', '.json', '.pdf', '.docx'];
         
         this.init();
     }
@@ -69,7 +69,7 @@ class FileUploader {
         if (!this.isValidFileType(file)) {
             return {
                 valid: false,
-                message: `Please upload a ${this.ALLOWED_EXTENSION} file only. WhatsApp exports chats as ${this.ALLOWED_EXTENSION} files.`
+                message: `Please upload a supported file type: ${this.ALLOWED_EXTENSIONS.join(', ')}`
             };
         }
         
@@ -91,8 +91,9 @@ class FileUploader {
      * @returns {boolean} True if valid
      */
     isValidFileType(file) {
-        return file && file.name && 
-               file.name.toLowerCase().endsWith(this.ALLOWED_EXTENSION.toLowerCase());
+        if (!file || !file.name) return false;
+        const lowerName = file.name.toLowerCase();
+        return this.ALLOWED_EXTENSIONS.some(ext => lowerName.endsWith(ext.toLowerCase()));
     }
     
     /**

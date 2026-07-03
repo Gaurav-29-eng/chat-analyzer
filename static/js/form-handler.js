@@ -146,18 +146,82 @@ class FormHandler {
         // Mood
         const mood = data.analysis?.mood || data.mood || 'Unknown';
         const score = data.analysis?.score ?? data.score ?? 0;
+        const totalMessages = data.analysis?.total_messages || 0;
+        const avgLength = data.analysis?.avg_length || 0;
+
+        // Build emoji usage HTML
+        let emojiHtml = '';
+        if (data.emoji_usage && Object.keys(data.emoji_usage).length > 0) {
+            const emojiEntries = Object.entries(data.emoji_usage);
+            emojiHtml = `
+                <div class="analysis-row">
+                    <span class="analysis-label">Top Emojis:</span>
+                    <div class="emoji-list">
+                        ${emojiEntries.map(([emoji, count]) => `<span class="emoji-item">${emoji} (${count})</span>`).join('')}
+                    </div>
+                </div>
+            `;
+        }
+
+        // Build links HTML
+        let linksHtml = '';
+        if (data.links_shared && data.links_shared.length > 0) {
+            linksHtml = `
+                <div class="analysis-row">
+                    <span class="analysis-label">Links Shared (${data.links_shared.length}):</span>
+                    <div class="links-list">
+                        ${data.links_shared.slice(0, 5).map(link => `<a href="${link}" target="_blank" class="link-item">${link}</a>`).join('')}
+                        ${data.links_shared.length > 5 ? `<span class="more-links">+${data.links_shared.length - 5} more</span>` : ''}
+                    </div>
+                </div>
+            `;
+        }
+
+        // Build peak hours HTML
+        let peakHoursHtml = '';
+        if (data.peak_hours && data.peak_hours.peak_hour) {
+            peakHoursHtml = `
+                <div class="analysis-row">
+                    <span class="analysis-label">Peak Chatting Hour:</span>
+                    <span class="analysis-value">${data.peak_hours.peak_hour} (${data.peak_hours.peak_count} messages)</span>
+                </div>
+            `;
+        }
+
+        // Build most active user HTML
+        let activeUserHtml = '';
+        if (data.most_active_user && data.most_active_user.user) {
+            activeUserHtml = `
+                <div class="analysis-row">
+                    <span class="analysis-label">Most Active User:</span>
+                    <span class="analysis-value">${data.most_active_user.user} (${data.most_active_user.message_count} messages)</span>
+                </div>
+            `;
+        }
 
         container.innerHTML = `
             <div class="analysis-card">
                 <h3>Analysis Results</h3>
-                <div class="analysis-row">
-                    <span class="analysis-label">Mood:</span>
-                    <span class="analysis-value mood-${mood.toLowerCase()}">${mood}</span>
+                <div class="analysis-stats-grid">
+                    <div class="stat-box">
+                        <span class="stat-label">Total Messages</span>
+                        <span class="stat-value">${totalMessages}</span>
+                    </div>
+                    <div class="stat-box">
+                        <span class="stat-label">Mood</span>
+                        <span class="stat-value mood-${mood.toLowerCase()}">${mood}</span>
+                    </div>
+                    <div class="stat-box">
+                        <span class="stat-label">Sentiment Score</span>
+                        <span class="stat-value">${score}</span>
+                    </div>
+                    <div class="stat-box">
+                        <span class="stat-label">Avg Message Length</span>
+                        <span class="stat-value">${avgLength} chars</span>
+                    </div>
                 </div>
-                <div class="analysis-row">
-                    <span class="analysis-label">Score:</span>
-                    <span class="analysis-value">${score}</span>
-                </div>
+                ${activeUserHtml}
+                ${peakHoursHtml}
                 ${data.top_words ? `
                 <div class="analysis-row">
                     <span class="analysis-label">Top Words:</span>
@@ -166,6 +230,8 @@ class FormHandler {
                     </div>
                 </div>
                 ` : ''}
+                ${emojiHtml}
+                ${linksHtml}
                 ${data.summary ? `
                 <div class="analysis-row">
                     <span class="analysis-label">Summary:</span>

@@ -39,11 +39,11 @@
                 <!-- Info Box -->
                 <div class="info-box" role="note">
                     <span class="info-icon" aria-hidden="true">ℹ️</span>
-                    <span>Supports WhatsApp exported .txt format only</span>
+                    <span>Supports .txt, .csv, .json, .pdf, and .docx files</span>
                 </div>
                 
                 <!-- Form -->
-                <form action="{{ url_for('submit_chat') }}" method="POST" id="chat-form" novalidate>
+                <form id="chat-form" novalidate>
                     <!-- Title Field -->
                     <div class="form-group">
                         <label for="title">Title <span aria-label="required">*</span></label>
@@ -65,10 +65,10 @@
                             type="file" 
                             id="file-upload" 
                             name="file-upload" 
-                            accept=".txt,.pdf,.docx"
+                            accept=".txt,.csv,.json,.pdf,.docx"
                             aria-describedby="file-hint file-error"
                         >
-                        <small id="file-hint" class="hint">Or paste chat content manually below. Only .txt files are accepted.</small>
+                        <small id="file-hint" class="hint">Or paste chat content manually below. Supports .txt, .csv, .json, .pdf, and .docx files.</small>
                         <div id="file-error" class="file-error" role="alert" aria-live="polite"></div>
                     </div>
                     

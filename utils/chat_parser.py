@@ -1,8 +1,8 @@
 import re
 
 
-# WhatsApp: dd/mm/yy, hh:mm - name: msg
-WHATSAPP_PATTERN = r"(\d{1,2}/\d{1,2}/\d{2,4}), (\d{1,2}:\d{2}(?::\d{2})?(?:\s*[APap][Mm])?)\s*-\s*(.*?):\s*(.*)"
+# WhatsApp: dd/mm/yy, hh:mm - name: msg (with optional spaces around colon)
+WHATSAPP_PATTERN = r"(\d{1,2}/\d{1,2}/\d{2,4}), (\d{1,2}:\d{2}(?::\d{2})?(?:\s*[APap][Mm])?)\s*-\s*(.*?)\s*:\s*(.*)"
 
 # System messages to ignore
 SYSTEM_KEYWORDS = [

@@ -65,7 +65,7 @@ class ChatAnalyzerApp {
                 errorContainer: elements.fileError,
                 contentTextarea: elements.contentTextarea,
                 maxFileSize: 10 * 1024 * 1024, // 10MB
-                allowedExtension: '.txt',
+                allowedExtensions: ['.txt', '.csv', '.json', '.pdf', '.docx'],
                 onSuccess: (content) => {
                     // Clear content error when file is successfully loaded
                     if (this.components.formValidator) {
